@@ -1,0 +1,116 @@
+<html>
+    <head>
+        <title>Index</title>
+    </head>
+    <body>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+      <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+      <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+
+      <!-- Wide card with share menu button -->
+      <style>
+      .center {
+          right: 50%;
+          bottom: 50%;
+          transform: translate(50%) translateY(50%);
+          position: absolute;
+      }
+      .passwd-card-wide.mdl-card {
+        width: 512px;
+      }
+      .passwd-card-wide > .mdl-card__title {
+        color: #fff;
+        height: 176px;
+        background: url('static/bg.png') center / cover;
+      }
+      .passwd-card-wide > .mdl-card__menu {
+        color: #fff;
+      }
+      .error {
+        color: rgb(213, 0, 0);
+      }
+      .success {
+        color: rgb(76, 175, 80);
+      }
+      </style>
+      <div class="passwd-card-wide mdl-card mdl-shadow--2dp center">
+        <div class="mdl-card__title">
+          <h2 class="mdl-card__title-text">SFTP password changer.</h2>
+        </div>
+        {{if .Session.username}}
+        <div class="mdl-card__supporting-text">
+          Logged in as: {{.Session.username}}
+        </div>
+        {{end}}
+        {{if .ErrorMsg}}
+        <div class="mdl-card__supporting-text error">
+          Error: {{.ErrorMsg}}
+        </div>
+        {{end}}
+        {{if .SuccessMsg}}
+        <div class="mdl-card__supporting-text success">
+          {{.SuccessMsg}}
+        </div>
+        {{end}}
+        <center>
+        {{if eq .Function "welcome"}}
+        <div class="mdl-card__actions mdl-card--border">
+          {{if .Session.username}}
+          <a class="mdl-button mdl-button--colored mdl-js-button mdl-button--raised" href="/changepw">
+            Change Password
+          </a>
+          <a class="mdl-button mdl-button--colored mdl-js-button mdl-button--raised" href="/logout">
+            Logout
+          </a>
+          {{else}}
+          <a class="mdl-button mdl-button--colored mdl-js-button mdl-button--raised" href="/login">
+            Login
+          </a>
+          {{end}}
+        </div>
+        {{else if eq .Function "login"}}
+        <form method="POST">
+          <div class="mdl-textfield mdl-js-textfield">
+            <input class="mdl-textfield__input" type="text" id="username" name="username" pattern="[A-Z,a-z,1-9]*">
+            <label class="mdl-textfield__label" for="username">User name</label>
+            <span class="mdl-textfield__error">Letters and digits only</span>
+          </div>
+          <div class="mdl-textfield mdl-js-textfield">
+            <input class="mdl-textfield__input" type="password" id="password" name="password" pattern=".{8,}">
+            <label class="mdl-textfield__label" for="password">Password</label>
+            <span class="mdl-textfield__error">Must be at least 8 character</span>
+          </div>
+          <div class="mdl-card__actions">
+            <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+              Login
+            </button>
+          </div>
+        </form>
+
+        {{else if eq .Function "changepw"}}
+        <form method="POST">
+          <div class="mdl-textfield mdl-js-textfield">
+            <input class="mdl-textfield__input" type="password" id="password" name="password" pattern=".{8,}">
+            <label class="mdl-textfield__label" for="password">New password</label>
+            <span class="mdl-textfield__error">Must be at least 8 character</span>
+          </div>
+          <div class="mdl-textfield mdl-js-textfield">
+            <input class="mdl-textfield__input" type="password" id="password2" name="password2" pattern=".{8,}">
+            <label class="mdl-textfield__label" for="password2">New password again</label>
+            <span class="mdl-textfield__error">Must be at least 8 character</span>
+          </div>
+          <div class="mdl-card__actions">
+          <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+            Change
+          </button>
+          <a class="mdl-button mdl-button--colored mdl-js-button mdl-button--raised" href="/logout">
+            Logout
+          </a>
+          </div>
+        </form>
+        {{else }}
+        {{end}}
+      </center>
+      </div>
+  </body>
+</html>
