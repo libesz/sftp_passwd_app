@@ -102,19 +102,24 @@ func changePwPostHandler(w http.ResponseWriter, r *http.Request) {
 	password := r.PostForm.Get("password")
 	password2 := r.PostForm.Get("password2")
 	session, _ := store.Get(r, "session")
+	username, _ := session.Values["username"].(string)
 	data := PageData{Function: "changepw", Session: session.Values}
 	if password != password2 {
 		data.ErrorMsg = "Password fields does not match."
 	} else if len(password) < 8 {
 		data.ErrorMsg = "Password must be at least 8 characters."
 	} else {
+		_, err := changePassword(username, password)
+		if err != nil {
+			//TODO
+			return
+		}
 		data.SuccessMsg = "Password has been successfully updated."
 	}
 	templates.ExecuteTemplate(w, "index.html", data)
 }
 
 func validatePassword(username, password string) (bool, error) {
-	//TODO
 	file, err := os.Open(os.Getenv("USERS_CONF"))
 	if err != nil {
 		return false, err
@@ -128,5 +133,39 @@ func validatePassword(username, password string) (bool, error) {
 		}
 	}
 	return false, nil
+}
+
+func changePassword(username, password string) (bool, error) {
+	file, err := os.OpenFile(os.Getenv("USERS_CONF"), os.O_RDWR, 0755)
+	if err != nil {
+		return false, err
+	}
+	defer file.Close()
+	var users []string
+	changed := false
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		s := scanner.Text()
+		log.Println("read:", s)
+		ss := strings.Split(scanner.Text(), ":")
+		if ss[0] == username {
+			ss[1] = password
+			s = strings.Join(ss, ":")
+			changed = true
+		}
+		users = append(users, s)
+	}
+	if changed == true {
+		file.Truncate(0)
+		file.Seek(0,0)
+		for _, v := range users {
+			log.Println("write:", v)
+			_, err := file.WriteString(v+"\n")
+			if err != nil {
+				log.Println(err)
+			}
+		}
+	}
+	return true, nil
 }
 
