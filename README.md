@@ -12,10 +12,10 @@ This is a self service password changer web application for end users. It is des
 
 ### TODO:
 * [x] GUI
-* [ ] Create Dockerfile
-* [ ] Real authentication
+* [x] Create Dockerfile
+* [x] Real authentication
 * [ ] Actual password handling
-* [ ] Configuration via env variables
+* [x] Configuration via env variables
 * [ ] Documentation
 
 ### Super extra TODO:

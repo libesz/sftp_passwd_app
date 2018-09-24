@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"html/template"
 	"log"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -112,6 +115,18 @@ func changePwPostHandler(w http.ResponseWriter, r *http.Request) {
 
 func validatePassword(username, password string) (bool, error) {
 	//TODO
-	return true, nil
+	file, err := os.Open(os.Getenv("USERS_CONF"))
+	if err != nil {
+		return false, err
+	}
+	defer file.Close()
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		s := strings.Split(scanner.Text(), ":")
+		if s[0] == username && s[1] == password {
+			return true, nil
+		}
+	}
+	return false, nil
 }
 
