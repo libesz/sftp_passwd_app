@@ -28,7 +28,7 @@ func main() {
 
 	srv := &http.Server{
 		Handler: r,
-		Addr:    "127.0.0.1:8000",
+		Addr:    ":8000",
 		// Good practice: enforce timeouts for servers you create!
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
@@ -61,11 +61,22 @@ func loginGetHandler(w http.ResponseWriter, r *http.Request) {
 func loginPostHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	username := r.PostForm.Get("username")
-	//password := r.PostForm.Get("password")
-	session, _ := store.Get(r, "session")
-	session.Values["username"] = username
-	session.Save(r, w)
-	http.Redirect(w, r, "/", http.StatusFound)
+	password := r.PostForm.Get("password")
+	pwValid, err := validatePassword(username, password)
+	if err != nil {
+		//TODO!!!
+		return
+	}
+	if pwValid {
+		session, _ := store.Get(r, "session")
+		session.Values["username"] = username
+		session.Save(r, w)
+		http.Redirect(w, r, "/", http.StatusFound)
+	} else {
+		data := PageData{Function: "login"}
+		data.ErrorMsg = "Wrong username or password!"
+		templates.ExecuteTemplate(w, "index.html", data)
+	}
 }
 
 func logoutGetHandler(w http.ResponseWriter, r *http.Request) {
@@ -98,3 +109,9 @@ func changePwPostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	templates.ExecuteTemplate(w, "index.html", data)
 }
+
+func validatePassword(username, password string) (bool, error) {
+	//TODO
+	return true, nil
+}
+
